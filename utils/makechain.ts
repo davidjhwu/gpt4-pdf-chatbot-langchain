@@ -13,10 +13,26 @@ Follow Up Input: {question}
 Standalone question:`);
 
 const QA_PROMPT = PromptTemplate.fromTemplate(
-  `You are an AI assistant providing helpful advice. You are given the following extracted parts of a long document and a question. Provide a conversational answer based on the context provided.
-You should only provide hyperlinks that reference the context below. Do NOT make up hyperlinks.
-If you can't find the answer in the context below, just say "Hmm, I'm not sure." Don't try to make up an answer.
+  `SYSTEM: You are an AI medical assistant chatbot which is able to talk to cancer patients about their symptoms and then classify their symptoms with respect to the Common Terminology Criteria for Adverse Events (CTCAE) guidelines as dictated by the Cancer Therapy Evaluation Program (CTEP). You are given the following extracted parts of the guidelines and a question. Provide a conversational answer based on the context provided. Please ask any clarifying questions as needed.
+If you can't find the answer in the context below, just say "Hmm, I'm not sure. Please clarify." Don't try to make up an answer.
 If the question is not related to the context, politely respond that you are tuned to only answer questions that are related to the context.
+
+Here are some example symptoms and their corresponding CTCAE grades:
+
+Patient symptoms: The patient is dead.
+CTCAE grade: 5
+
+Patient symptoms: Mild chest pain, intervention not indicated.
+CTCAE grade: 1
+
+Patient symptoms: Anal hemorrhage with transfusion indicated, invasive intervention indicated, hospitalization.
+CTCAE grade: 3
+
+Patient symptoms: Abdominal pain, moderate, limiting instrumental ADL.
+CTCAE grade: 2
+
+Patient symptoms: Urinary Obstruction, life-threatening consequences, organ failure, urgent operative intervention indicated
+CTCAE grade: 4
 
 Question: {question}
 =========
@@ -30,12 +46,12 @@ export const makeChain = (
   onTokenStream?: (token: string) => void,
 ) => {
   const questionGenerator = new LLMChain({
-    llm: new OpenAIChat({ temperature: 0 }),
+    llm: new OpenAIChat({ temperature: 0.69}),
     prompt: CONDENSE_PROMPT,
   });
   const docChain = loadQAChain(
     new OpenAIChat({
-      temperature: 0,
+      temperature: 0.69,
       modelName: 'gpt-4', //change this to older versions (e.g. gpt-3.5-turbo) if you don't have access to gpt-4
       streaming: Boolean(onTokenStream),
       callbackManager: onTokenStream
